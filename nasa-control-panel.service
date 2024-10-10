@@ -1,0 +1,20 @@
+[Unit]
+Description=NASA Control Panel Simulation
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /path/to/your/start_mission_control.py
+WorkingDirectory=/path/to/your/nasa_control_panel_directory
+User=your_username
+Group=your_usergroup
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Uncomment and modify the following line if you're using a virtual environment
+# Environment="PATH=/path/to/your/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy=multi-user.target

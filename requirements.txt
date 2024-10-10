@@ -1,0 +1,4 @@
+RPi.GPIO==0.7.0
+pygame==2.1.2
+websockets==10.3
+asyncio==3.4.3

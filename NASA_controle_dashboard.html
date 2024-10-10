@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Control Panel Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0a0e17;
+            --card-bg: #1a1f2e;
+            --text-color: #e0e0e0;
+            --accent-color: #4a9fff;
+            --danger-color: #ff4a4a;
+            --success-color: #4aff4a;
+            --warning-color: #ffff4a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .value {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .button {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .button:hover {
+            background-color: #3a8ae0;
+        }
+        
+        .button.danger {
+            background-color: var(--danger-color);
+        }
+        
+        .button.danger:hover {
+            background-color: #e04a4a;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 5px;
+            background: #2a3040;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .slider:hover {
+            opacity: 1;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+        }
+        
+        #orbitMap {
+            width: 100%;
+            height: 200px;
+            background: radial-gradient(circle, #1a3a6a 0%, #0a1a3a 100%);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #spacecraft {
+            width: 10px;
+            height: 10px;
+            background-color: var(--warning-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NASA Control Panel Dashboard</h1>
+        
+        <div class="dashboard-grid">
+            <!-- Mission Control Overview -->
+            <div class="card">
+                <h2>Mission Control Overview</h2>
+                <div class="data-item">
+                    <span>Mission Phase:</span>
+                    <span id="missionPhase" class="value">LAUNCH</span>
+                </div>
+                <div class="data-item">
+                    <span>Mission Time:</span>
+                    <span id="missionTime" class="value">T+000:00:00:00</span>
+                </div>
+                <div class="data-item">
+                    <span>Altitude:</span>
+                    <span id="altitude" class="value">0 km</span>
+                </div>
+                <div class="data-item">
+                    <span>Velocity:</span>
+                    <span id="velocity" class="value">0 km/s</span>
+                </div>
+            </div>
+
+            <!-- Telemetry Data -->
+            <div class="card">
+                <h2>Telemetry Data</h2>
+                <div class="data-item">
+                    <span>Fuel Level:</span>
+                    <input type="range" id="fuelLevel" class="slider" min="0" max="100" value="100">
+                    <span id="fuelLevelValue" class="value">100%</span>
+                </div>
+                <div class="data-item">
+                    <span>Temperature:</span>
+                    <input type="range" id="temperature" class="slider" min="-50" max="100" value="22">
+                    <span id="temperatureValue" class="value">22°C</span>
+                </div>
+                <div class="data-item">
+                    <span>Radiation Level:</span>
+                    <input type="range" id="radiationLevel" class="slider" min="0" max="1" step="0.01" value="0.1">
+                    <span id="radiationLevelValue" class="value">0.1 mSv/h</span>
+                </div>
+                <div class="data-item">
+                    <span>Oxygen Level:</span>
+                    <input type="range" id="oxygenLevel" class="slider" min="0" max="100" value="100">
+                    <span id="oxygenLevelValue" class="value">100%</span>
+                </div>
+            </div>
+
+            <!-- Orbit Location -->
+            <div class="card">
+                <h2>Orbit Location</h2>
+                <div class="data-item">
+                    <span>Current Location:</span>
+                    <span id="orbitLocation" class="value">PACIF</span>
+                </div>
+                <div id="orbitMap">
+                    <div id="spacecraft"></div>
+                </div>
+            </div>
+
+            <!-- Alarm System -->
+            <div class="card">
+                <h2>Alarm System</h2>
+                <div class="data-item">
+                    <span>Status:</span>
+                    <span id="alarmStatus" class="value" style="color: var(--success-color);">INACTIVE</span>
+                </div>
+                <button id="triggerAlarm" class="button danger">Trigger Alarm</button>
+                <button id="silenceAlarm" class="button">Silence Alarm</button>
+            </div>
+
+            <!-- Audio Controls -->
+            <div class="card">
+                <h2>Audio Controls</h2>
+                <div class="data-item">
+                    <span>Master Volume:</span>
+                    <input type="range" id="masterVolume" class="slider" min="0" max="100" value="100">
+                </div>
+                <button class="button sound-button" data-sound="beep">Play Beep</button>
+                <button class="button sound-button" data-sound="launch">Play Launch</button>
+                <button class="button sound-button" data-sound="space_ambience">Play Ambient</button>
+                <button class="button sound-button" data-sound="radio_static">Play Radio</button>
+            </div>
+
+            <!-- Simulation Controls -->
+            <div class="card">
+                <h2>Simulation Controls</h2>
+                <button id="startSimulation" class="button">Start</button>
+                <button id="pauseSimulation" class="button">Pause</button>
+                <button id="stopSimulation" class="button danger">Stop</button>
+                <div class="data-item">
+                    <span>Simulation Speed:</span>
+                    <input type="range" id="simulationSpeed" class="slider" min="0.1" max="10" step="0.1" value="1">
+                    <span id="simulationSpeedValue" class="value">1x</span>
+                </div>
+            </div>
+
+            <!-- Display Controls -->
+            <div class="card">
+                <h2>Display Controls</h2>
+                <div class="data-item">
+                    <span>LED Brightness:</span>
+                    <input type="range" id="displayBrightness" class="slider" min="0" max="7" value="7">
+                    <span id="displayBrightnessValue" class="value">7</span>
+                </div>
+                <div class="data-item">
+                    <span>Display Mode:</span>
+                    <select id="displayMode" class="button">
+                        <option value="0">Normal</option>
+                        <option value="1">Crew</option>
+                        <option value="2">Location</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8000');
+        let simulationRunning = false;
+
+        socket.onopen = function(e) {
+            console.log("[open] Connection established");
+            getStatus();
+        };
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            updateDashboard(data);
+        };
+
+        function sendCommand(command, data = {}) {
+            const message = { command, ...data };
+            socket.send(JSON.stringify(message));
+        }
+
+        function getStatus() {
+            sendCommand('get_status');
+        }
+
+        function updateDashboard(data) {
+            if (data.missionPhase) {
+                document.getElementById('missionPhase').textContent = data.missionPhase;
+                document.getElementById('missionTime').textContent = data.missionTime;
+                document.getElementById('altitude').textContent = data.altitude.toFixed(2) + ' km';
+                document.getElementById('velocity').textContent = data.velocity.toFixed(2) + ' km/s';
+                document.getElementById('orbitLocation').textContent = data.orbitLocation;
+                
+                document.getElementById('fuelLevelValue').textContent = data.telemetry.FUEL.toFixed(1) + '%';
+                document.getElementById('fuelLevel').value = data.telemetry.FUEL;
+                
+                document.getElementById('temperatureValue').textContent = data.telemetry.TEMP.toFixed(1) + '°C';
+                document.getElementById('temperature').value = data.telemetry.TEMP;
+                
+                document.getElementById('radiationLevelValue').textContent = data.telemetry.RADL.toFixed(2) + ' mSv/h';
+                document.getElementById('radiationLevel').value = data.telemetry.RADL;
+                
+                document.getElementById('oxygenLevelValue').textContent = data.telemetry.OXGN.toFixed(1) + '%';
+                document.getElementById('oxygenLevel').value = data.telemetry.OXGN;
+
+                document.getElementById('alarmStatus').textContent = data.alarmActive ? 'ACTIVE' : 'INACTIVE';
+                document.getElementById('alarmStatus').style.color = data.alarmActive ? 'var(--danger-color)' : 'var(--success-color)';
+            }
+        }
+
+        // Update status every second
+        setInterval(getStatus, 1000);
+
+        // Simulation controls
+        document.getElementById('startSimulation').addEventListener('click', () => {
+            sendCommand('start_simulation');
+            simulationRunning = true;
+        });
+
+        document.getElementById('pauseSimulation').addEventListener('click', () => {
+            sendCommand('pause_simulation');
+            simulationRunning = false;
+        });
+
+        document.getElementById('stopSimulation').addEventListener('click', () => {
+            sendCommand('stop_simulation');
+            simulationRunning = false;
+        });
+
+        document.getElementById('simulationSpeed').addEventListener('input', function() {
+            const speed = parseFloat(this.value);
+            document.getElementById('simulationSpeedValue').textContent = speed.toFixed(1) + 'x';
+            sendCommand('set_simulation_speed', { speed });
+        });
+
+        // Telemetry controls
+        ['fuelLevel', 'temperature', 'radiationLevel', 'oxygenLevel'].forEach(id => {
+            document.getElementById(id).addEventListener('change', function() {
+                const telemetry = {};
+                telemetry[id.toUpperCase()] = parseFloat(this.value);
+                sendCommand('update_telemetry', { telemetry });
+            });
+        });
+
+        // Alarm controls
+        document.getElementById('triggerAlarm').addEventListener('click', () => {
+            sendCommand('trigger_alarm');
+        });
+
+        document.getElementById('silenceAlarm').addEventListener('click', () => {
+            sendCommand('silence_alarm');
+        });
+
+        // Sound controls
+        document.querySelectorAll('.sound-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const sound = this.getAttribute('data-sound');
+                sendCommand('play_sound', { sound });
+            });
+        });
+
+        // Display controls
+        document.getElementById('displayMode').addEventListener('change', function() {
+            sendCommand('set_display_mode', { mode: parseInt(this.value) });
+        });
+
+        document.getElementById('displayBrightness').addEventListener('input', function() {
+            const brightness = parseInt(this.value);
+            document.getElementById('displayBrightnessValue').textContent = brightness;
+            sendCommand('set_display_brightness', { brightness });
+        });
+    </script>
+</body>
+</html>
